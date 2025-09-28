@@ -6,7 +6,7 @@ If you have any questions, checkout our [documentation](https://docs.streamlit.i
 forums](https://discuss.streamlit.io).
 
 
-# Run the command below from the terminal
+## After running python code at CodeSpaces, run the command below from the Terminal
 --> copy paste
 
 $ streamlit run streamlit_app.py --server.enableCORS false --server.enableXsrfProtection false
