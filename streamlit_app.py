@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import plotly.graph_objects as go
 
-import requests
-from io import StringIO
+# import requests
+# from io import StringIO
 
 import warnings
 warnings.filterwarnings('ignore')
