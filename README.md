@@ -4,7 +4,7 @@ Assignment Day 40, at bootcamp DS/DA batch 34 [dibimbing.id](https://dibimbing.i
 Here is [my work](https://telco-customer-churn-analysis-2025.streamlit.app/)
 
 If you have any questions, checkout our [documentation](https://docs.streamlit.io) and [community
-forums](https://discuss.streamlit.io).
+forums](https://discuss.streamlit.io).<br><br>
 
 
 ## NOTES:
