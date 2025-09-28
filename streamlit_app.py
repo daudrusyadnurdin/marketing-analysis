@@ -8,6 +8,7 @@ import numpy as np #number
 import seaborn as sns
 import matplotlib.pyplot as plt
 import plotly.express as px
+import plotly.graph_objects as go
 
 import requests
 from io import StringIO
@@ -46,7 +47,7 @@ df['Total Charges'] = pd.to_numeric(df['Total Charges'], errors='coerce')
 header_image_url = "https://raw.githubusercontent.com/daudrusyadnurdin/marketing-analysis/master/telco-business.jpg"
 st.image(header_image_url, use_container_width=True)
 
-st.title("📊 Telco Customer Churn Analysis")
+st.title("🔄 Telco Customer Churn Analysis")
 st.markdown("""
             The telecommunications industry is highly competitive, making customer churn a particular concern, 
             given the increasingly high cost of acquiring new customers. 
@@ -62,7 +63,7 @@ st.sidebar.header("Filtering parameters")
 
 # Geographic filters
 flt_city = st.sidebar.multiselect("City", 
-                                    options=df['City'].unique()
+                                    options=sorted(df['City'].dropna().unique())
                                  )
 
 # Demographic filters
@@ -128,14 +129,14 @@ if df_selected.empty:
 #-------------------------------------
 # KPI
 #-------------------------------------
-st.subheader("📊 Key Metrics")
+st.subheader("🔢 Key Metrics")
 
 col1, col2, col3, col4, col5, col6 = st.columns(6)
 
 total_customers = len(df_selected)
 churn_customers = df_selected['Churn Label'].value_counts().get('Yes', 0)
 total_revenue = df_selected['Total Charges'].sum()
-churn_revenue = df_selected[df_selected['Churn Label'] == 'Yes']['Total Charges'].iloc[0] if 'Yes' in df_selected['Churn Label'].values else 0
+churn_revenue = df_selected[df_selected['Churn Label'] == 'Yes']['Total Charges'].sum()
 
 with col1:
     st.metric("Total Customers", f"{total_customers:,}")
@@ -144,41 +145,44 @@ with col2:
 with col3:
     st.metric("Churn Rate", f"{(churn_customers/total_customers)*100:.1f}%")
 with col4:
-    st.metric("Total Revenue", f"${total_revenue:,.0f}")
+    st.metric("Total Revenue (k US$)", f"${total_revenue/1000:,.2f}")
 with col5:
-    st.metric("Revenue at Risk", f"${churn_revenue:,.0f}")
+    st.metric("Revenue at Risk (k US$)", f"${churn_revenue/1000:,.2f}")
 with col6:
-    st.metric("% Revenue at Risk", f"{(churn_revenue/total_revenue)*100:.4f}%")
+    st.metric("% Revenue at Risk", f"{(churn_revenue/total_revenue)*100:.2f}%")
 
 st.markdown("---")
 
-#-------------------------------------
-# Churn reason
-#-------------------------------------
-st.subheader("📊 Total Churn by Reason in California - USA")
-
+#------------------------------------------
+# Churn reason: based on customer
+#------------------------------------------
+st.subheader("💔 Why our customer churn?")
 # --- Buat Figure ---
-fig, ax = plt.subplots(figsize=(12, 9))  
+fig, ax = plt.subplots(figsize=(10, 6))  
 
 # --- Data ---
 df_cr = (
     df_selected.groupby("Churn Reason")["Churn Value"]
-      .sum()
-      .reset_index()
-      .sort_values(by="Churn Value")
+    .sum()
+    .reset_index()
+    .sort_values(by="Churn Value")  # urut dari kecil ke besar
 )
 
+# --- Buat daftar warna dinamis ---
+n = len(df_cr)
+# default semua lightgrey
+colors = ["lightgrey"] * n
+# ganti 3 terakhir (nilai tertinggi) jadi lightsalmon, salmon, tomato
+top_colors = ["tomato", "salmon", "lightsalmon"]
+for i, c in enumerate(top_colors, start=1):
+    if i <= n:  # antisipasi jika data < 3
+        colors[-i] = c
+
 # --- Plot Horizontal Bar ---
-ax.barh(
-    df_cr["Churn Reason"],
-    df_cr["Churn Value"],
-    color=[
-        'lightgrey', 'lightgrey', 'lightgrey', 'lightgrey', 'lightgrey',
-        'lightgrey', 'lightgrey', 'lightgrey', 'lightgrey', 'lightgrey',
-        'lightgrey', 'lightgrey', 'lightgrey', 'lightgrey', 'lightgrey',
-        'lightgrey', 'lightgrey', 'lightsalmon', 'salmon', 'tomato'
-    ]
-)
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.barh(df_cr["Churn Reason"], df_cr["Churn Value"], color=colors)
+
+ax.bar_label(ax.containers[0], padding=3)
 
 # --- Judul & Label ---
 ax.set_ylabel("Churn Reason")
@@ -195,91 +199,316 @@ plt.tight_layout()
 st.pyplot(fig)
 
 
-#---------------------------------------------
-# Dashboard and report
-#---------------------------------------------
-# Define consistent chart size for columns
-# CHART_WIDTH = 6
-# CHART_HEIGHT = 5
-# CHART_SIZE = (CHART_WIDTH, CHART_HEIGHT)
+col1, col2 = st.columns(2)
 
-# viz_col1, viz_col2 = st.columns(2)
+with col1:
+    #-----------------------------------------------------------
+    # Top 10 - Total Charges
+    #-----------------------------------------------------------
+    st.subheader("💰 Top 10 most productive cities...")
 
-# with viz_col1:
-#     st.subheader("👥 Customer Churn Distribution")
-    
-#     # Pie Chart
-#     fig1, ax1 = plt.subplots(figsize=CHART_SIZE)
-    
-#     churn_counts = df['Churn Label'].value_counts()
-    
-#     # Pie chart dengan styling yang better
-#     colors = ['#2ecc71', "#e7e43c"]  # Green for No Churn, Red for Churn
-#     explode = (0, 0.05)  # Mild explode untuk emphasis
-    
-#     wedges, texts, autotexts = ax1.pie(
-#         churn_counts.values,
-#         labels=churn_counts.index,
-#         autopct='%1.1f%%',
-#         startangle=90,
-#         colors=colors,
-#         explode=explode,
-#         textprops={'fontsize': 9}
-#     )
-    
-#     # Improve text styling
-#     for autotext in autotexts:
-#         autotext.set_color('white')
-#         autotext.set_fontweight('bold')
-#         autotext.set_fontsize(8)
-    
-#     st.pyplot(fig1, use_container_width=True)
+    # --- Data (contoh sesuai kode Anda) ---
+    df_chrg_chrn10 = df_selected.groupby('City')[['Total Charges', 'Churn Value']].sum().reset_index().sort_values(by='Total Charges', ascending=False).head(10).reset_index(drop=True)
+    df_barh = df_chrg_chrn10.sort_values(by='Total Charges')
 
-# with viz_col2:
-#     st.subheader("💰 Revenue Impact")
+    # --- Figure & Axis ---
+    fig, ax = plt.subplots(figsize=(10, 6)) 
+
+    # --- Plot Horizontal Bar ---
+    colors = ['lightgrey'] * len(df_barh)
+    # colors[-3:] = ['lightgreen', 'limegreen', 'green']
+    colors[-3:] = ['#deebf7', '#6baed6', '#08519c']
+    ax.barh(
+        df_barh['City'],
+        df_barh['Total Charges'] / 1000,  # dibagi 1000 sesuai label
+        color=colors
+    )
+    ax.tick_params(axis='x', labelsize=15)   # angka pada sumbu X
+    ax.tick_params(axis='y', labelsize=15)   # nama kota pada sumbu Y
+
+    # --- Judul & Label ---
+    ax.set_ylabel("City", fontsize=16, color='red')
+    ax.set_xlabel("Total Charges (x1000)", fontsize=16, color='red')
+
+    # --- Grid & Style ---
+    ax.grid(axis='x', ls='--', color='lavender')
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+
+    # --- Annotasi Bar ---
+    ax.bar_label(ax.containers[0], fmt='%.0f', padding=3, fontsize=15)
+
+    plt.tight_layout()
+
+    # --- Tampilkan di Streamlit ---
+    st.pyplot(fig)
+
+with col2:
+    #-----------------------
+    #TOP 10 - TOTAL CUSTOMER
+    #-----------------------
+    st.subheader("👥 Top 10 most customers cities...")
+
+    fig, ax = plt.subplots(figsize=(10, 6)) 
+
+    df_barh = df_selected.groupby("City")['CustomerID'].count().reset_index().sort_values(by='CustomerID', ascending=False).head(10).sort_values(by='CustomerID')
+
+    colors = ['lightgrey'] * len(df_barh)
+    # colors[-3:] = ['lightgreen', 'limegreen', 'green']
+    colors[-3:] = ['#deebf7', '#6baed6', '#08519c']
+    ax.barh(  df_barh['City'],
+                df_barh['CustomerID'],
+                color=colors
+            )
+    ax.tick_params(axis='x', labelsize=15)   # angka pada sumbu X
+    ax.tick_params(axis='y', labelsize=15)   # nama kota pada sumbu Y
+
+    ax.set_ylabel("City", fontsize=16, color='red')
+    ax.set_xlabel("Total Customer", fontsize=16, color='red')
+
+    ax.grid(axis='x', ls='--', color='lavender')
+
+    #annotate bars
+    ax.bar_label(ax.containers[0], padding=3, fontsize=15)
+
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+
+    plt.tight_layout()
+
+    st.pyplot(fig)
+
+
+
+col1, col2 = st.columns(2)
+
+with col1:
+    #-------------------
+    #TOP 10 - TOTAL CURN
+    #-------------------
+    st.subheader("💔 Top 10 most churn cities...")
+
+    fig, ax = plt.subplots(figsize=(10, 6)) 
+    df_barh = df_selected.groupby("City")['Churn Value'].sum().reset_index().sort_values(by='Churn Value', ascending=False).head(10).sort_values(by='Churn Value')
     
-#     # Bar Chart
-#     fig2, ax2 = plt.subplots(figsize=CHART_SIZE)
+    n = len(df_barh)
+    colors = ["lightgrey"] * n
+    colors[-3:] = ["lightsalmon", "salmon", "tomato"]
+    ax.barh(  df_barh['City'],
+              df_barh['Churn Value'],
+              color=colors
+            )
+    ax.tick_params(axis='x', labelsize=15)   # angka pada sumbu X
+    ax.tick_params(axis='y', labelsize=15)   # nama kota pada sumbu Y
+
+    ax.set_ylabel("City", fontsize=16, color='red')
+    ax.set_xlabel("Total Churn", fontsize=16, color='red')
+
+    ax.grid(axis='x', ls='--', color='lavender')
+
+    #annotate bars
+    ax.bar_label(ax.containers[0], padding=3, fontsize=15)
+
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+
+    plt.tight_layout()
+
+    st.pyplot(fig)
+
+with col2:
+    #-------------------
+    #TOP 10 - TOTAL CURN
+    #-------------------
+    st.subheader("")
+
+    fig, ax = plt.subplots(figsize=(10, 6)) 
+    # df_barh = df_selected.groupby("City")['Churn Value'].sum().reset_index().sort_values(by='Churn Value', ascending=False).head(10).sort_values(by='Churn Value')
     
-#     colors_bar = ['#2ecc71', '#e74c3c']  # Same color scheme as pie chart
+    # Hitung dulu total customer untuk di-merged dengan top-10 churn
+    df_barh2 = df.groupby("City")['CustomerID'].count().reset_index().sort_values(by='CustomerID', ascending=False).head(10).sort_values(by='CustomerID')
+
+    # Join/merge berdasarkan kolom City
+    # df_barh sudah dihitung sebelumnya, karena grafik ini kelanjutan dari grafik sebelumnya
+    df_merge = pd.merge(
+        df_barh,
+        df_barh2,
+        on="City",     # kolom kunci
+        how="inner"    # mengikuti yang 10 
+    )
+
+    # urutkan kembali
+    # Buat kolom persentase churn
+    df_merge['Churn %'] = df_merge['Churn Value'] / df_merge['CustomerID'] * 100
+
+    # Urut berdasarkan kolom baru
+    df_merge = df_merge.sort_values(by='Churn %', ascending=True)
+
+    n = len(df_merge)
+    colors = ["lightgrey"] * n
+    colors[-3:] = ["lightsalmon", "salmon", "tomato"]
+    ax.barh(  df_merge['City'],
+            #   df_sorted['Churn Value']/df_merge['CustomerID']*100,
+              df_merge['Churn %'],
+              color=colors
+            )
+    #annotate bars
+    ax.bar_label(ax.containers[0], padding=3, fontsize=15, fmt='%.2f%%')
+
+    ax.tick_params(axis='x', labelsize=15)   # angka pada sumbu X
+    ax.tick_params(axis='y', labelsize=15)   # nama kota pada sumbu Y
+
+    ax.set_ylabel("City", fontsize=16, color='red')
+    ax.set_xlabel("%age Churn", fontsize=16, color='red')
+
+    ax.grid(axis='x', ls='--', color='lavender')
+
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+
+    plt.tight_layout()
+
+    st.pyplot(fig)
+
+#-----------------------------------------------------------------------------------------------------
+# CLTV vs Churn analysis
+#-----------------------------------------------------------------------------------------------------
+st.subheader("📊 Will CLTV customers Churn?")
+st.markdown("Analyzing customer lifetime value relationship with churn behavior")
+
+# Create CLTV segments
+q1 = df_selected['CLTV'].quantile(0.33)
+q2 = df_selected['CLTV'].quantile(0.66)
+
+def segment(x):
+    if x >= 5000:      # contoh batas nilai CLTV dalam $
+        return 'Platinum'
+    elif x >= 2500:
+        return 'Gold'
+    elif x >= 1000:
+        return 'Silver'
+    else:
+        return 'Bronze'
+
+df_selected['CLTV Segment'] = df_selected['CLTV'].apply(segment)
+
+# Main analysis
+segment_analysis = df_selected.groupby('CLTV Segment').agg({
+                                                                'CustomerID'     : 'count',
+                                                                'Churn Value'    : 'sum',
+                                                                'CLTV'           : 'mean',
+                                                                'Monthly Charges': 'mean',
+                                                                'Tenure Months'  : 'mean'
+                                                            }).reset_index()
+
+segment_analysis['Churn Rate (%)'] = (segment_analysis['Churn Value'] / segment_analysis['CustomerID']) * 100
+segment_analysis['Avg CLTV'] = segment_analysis['CLTV']
+
+# Order segments
+segment_order = ['Bronze', 'Silver', 'Gold', 'Platinum']
+segment_analysis['CLTV Segment'] = pd.Categorical(
+                                                    segment_analysis['CLTV Segment'], 
+                                                    categories=segment_order, 
+                                                    ordered=True
+                                                )
+segment_analysis = segment_analysis.sort_values('CLTV Segment')
+
+
+# colors = ['#CD7F32', 'silver', 'gold', '#E2E2E2'] 
+colors = ['silver', 'gold', '#E2E2E2'] 
+
+# Row 1: Main charts
+col1, col2 = st.columns(2)
+
+with col1:
+    # Churn Rate by CLTV Segment - Plotly
+    fig1 = px.bar(
+                    segment_analysis,
+                    x='CLTV Segment',
+                    y='Churn Rate (%)',
+                    title='<b>Churn Rate by CLTV Segment</b>',
+                    color='CLTV Segment',
+                    color_discrete_sequence=colors,
+                    text_auto='.1f'
+                )
+    fig1.update_layout(
+                        xaxis_title="CLTV Segment",
+                        yaxis_title="Churn Rate (%)",
+                        showlegend=False
+                    )
+    st.plotly_chart(fig1, use_container_width=True)
+
+with col2:
+    # Customer Distribution - Plotly
+    fig2 = px.pie(
+                    segment_analysis,
+                    values='CustomerID',
+                    names='CLTV Segment',
+                    title='<b>Customer Distribution by CLTV Segment</b>',
+                    color='CLTV Segment',
+                    color_discrete_sequence=colors
+                )
+    fig2.update_traces(textposition='inside', textinfo='percent+label')
+    st.plotly_chart(fig2, use_container_width=True)
+
+# Row 2: Additional metrics
+col3, col4 = st.columns(2)
+
+with col3:
+    # Average CLTV by Segment
+    fig3 = px.bar(
+                    segment_analysis,
+                    x='CLTV Segment',
+                    y='Avg CLTV',
+                    title='<b>Average CLTV by Segment</b>',
+                    color='CLTV Segment',
+                    color_discrete_sequence=colors,
+                    text_auto='.0f'
+                )
+    fig3.update_layout(
+                    xaxis_title="CLTV Segment",
+                    yaxis_title="Average CLTV ($)",
+                    showlegend=False
+                )
+    st.plotly_chart(fig3, use_container_width=True)
+
+with col4:
+    # Monthly Charges vs Tenure
+
+    fig4 = go.Figure()
+    fig4.add_trace(go.Bar(
+                        name='Avg Monthly Charges',
+                        x=segment_analysis['CLTV Segment'],
+                        y=segment_analysis['Monthly Charges'],
+                        marker_color=colors,
+                        text=segment_analysis['Monthly Charges'].round(1),
+                        textposition='auto'
+                    ))
+    fig4.add_trace(go.Scatter(
+                        name='Avg Tenure (Months)',
+                        x=segment_analysis['CLTV Segment'],
+                        y=segment_analysis['Tenure Months'],
+                        mode='lines+markers+text',
+                        line=dict(color='#6baed6', width=3),
+                        marker=dict(size=10),
+                        text=segment_analysis['Tenure Months'].round(1),
+                        textposition='top center',
+                        yaxis='y2'
+                    ))
     
-#     bars = ax2.bar(
-#         df_bar_chrn['Churn Label'],
-#         df_bar_chrn['Total Charges'] / 1000,
-#         color=colors_bar,
-#         width=0.6,
-#         alpha=0.8,
-#         edgecolor='black',
-#         linewidth=0.5
-#     )
-    
-#     # Styling
-#     ax2.set_xlabel("Churn Status", fontsize=10, fontweight='bold')
-#     ax2.set_ylabel("Total Charges ($ Thousands)", fontsize=10, fontweight='bold')
-    
-#     # Grid and annotations
-#     ax2.grid(axis='y', alpha=0.3, linestyle='--')
-#     ax2.set_axisbelow(True)
-    
-#     # Annotations dengan positioning yang better
-#     max_value = df_bar_chrn['Total Charges'].max() / 1000
-#     for bar in bars:
-#         height = bar.get_height()
-#         ax2.text(bar.get_x() + bar.get_width()/2., height + max_value * 0.03,
-#                 f'${height:,.0f}K', 
-#                 ha='center', va='bottom', 
-#                 fontweight='bold', fontsize=9,
-#                 bbox=dict(boxstyle='round,pad=0.2', facecolor='white', alpha=0.8))
-    
-#     # Remove spines dan adjust layout
-#     for spine in ['top', 'right']:
-#         ax2.spines[spine].set_visible(False)
-    
-#     # Adjust y-axis limit untuk space annotations
-#     ax2.set_ylim(0, max_value * 1.15)
-    
-#     plt.tight_layout()
-#     st.pyplot(fig2, use_container_width=True)
+    fig4.update_layout(
+                        title='<b>Monthly Charges & Tenure by Segment</b>',
+                        xaxis_title="CLTV Segment",
+                        yaxis_title="Monthly Charges ($)",
+                        yaxis2=dict(
+                            title="Tenure (Months)",
+                            overlaying='y',
+                            side='right'
+                        ),
+                        showlegend=True
+                    )
+    st.plotly_chart(fig4, use_container_width=True)
+
 
 
 #-----------------------------------------------------------------------------------------------------
