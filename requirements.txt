@@ -1,7 +1,6 @@
-pandas
 streamlit
-seaborn
+pandas
 numpy
+seaborn
 matplotlib
 plotly
-warnings
