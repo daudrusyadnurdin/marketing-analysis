@@ -10,10 +10,12 @@ forums](https://discuss.streamlit.io).<br><br>
 ## NOTES:
 - During the development phase, open Codespaces, create a Python program in streamlit_app.py, and then run it. If there are any errors, identify them and how to fix them. Use AI to identify the problem and ask for answers. This will be much faster than trying to find code bugs yourself.
 
-- If it runs successfully (no errors), run this command. Run it in Terminal. Copy and paste it, then press Enter. Wait a few minutes until the process finished, then a message will appear at the bottom right of the screen [run in Browser] --> select the button and it will go to the browser we are aiming for.
+- If it runs successfully (no errors), run this command below at Terminal. Copy and paste it, then press Enter. Wait a few minutes until the process finished, then a message will appear at the bottom right of the screen [run in Browser] --> select the button and it will go to the browser we are aiming for.
 
-  $ streamlit run streamlit_app.py --server.enableCORS false --server.enableXsrfProtection false
-  
-- To deploy streamlit's work, create a runtime.txt in the root of the github repository and fill it with python-3.11 or another stable version.
+  **$ streamlit run streamlit_app.py --server.enableCORS false --server.enableXsrfProtection false**
 
-- Don't forget to include all the libraries imported in the Python program that we created in the requirements.txt file.
+- Before deploying your job, it's a good idea to give it a meaningful name in streamlit.io. For example, in this task, I named it **telco-customer-churn-analysis-2025.streamlit.app**. **streamlit.app** is the default streamlit name.
+
+- To deploy streamlit's work, create a **runtime.txt** in the root of the github repository and fill it with **python-3.11** or another stable version.
+
+- Don't forget to include all the libraries imported in the Python program that we created in the **requirements.txt file**.
