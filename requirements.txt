@@ -2,6 +2,6 @@ pandas
 streamlit
 seaborn
 numpy
-matplotlib.pyplot
+matplotlib
 plotly
 warnings
