@@ -6,9 +6,9 @@ If you have any questions, checkout our [documentation](https://docs.streamlit.i
 forums](https://discuss.streamlit.io).
 
 
-# Jalankan ini dari terminal 
---> lakukan copy paste
+# Run the command below from the terminal
+--> copy paste
 
 $ streamlit run streamlit_app.py --server.enableCORS false --server.enableXsrfProtection false
 
-Akan muncul di kanan bawah pesan [run in Browser] --> pilih tombol tersebut dan akan masuk ke browser yang kita tuju.
+A message will appear at the bottom right of the screen [run in Browser] --> select the button and it will go to the browser we are aiming for.
