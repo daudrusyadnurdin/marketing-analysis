@@ -3,7 +3,7 @@ Assignment Day 40, at bootcamp DS/DA batch 34 [dibimbing.id](https://dibimbing.i
 
 Here is [my streamlit work](https://telco-customer-churn-analysis-2025.streamlit.app/). Please click here.
 
-If you have any questions (about streamlit), checkout our [documentation](https://docs.streamlit.io) and [community
+If you have any questions (about streamlit), checkout the following addresses [documentation](https://docs.streamlit.io) and [community
 forums](https://discuss.streamlit.io).<br><br>
 
 
