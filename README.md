@@ -8,7 +8,7 @@ forums](https://discuss.streamlit.io).<br><br>
 
 
 ## NOTES:
-- During the development phase, open Codespaces, create a Python program in **streamlit_app.py**, and then run it. If there are any errors, identify them and how to fix them. Use AI to identify the problem and ask for answers. This will be much faster than trying to find code bugs yourself.
+- During the development phase, open Codespaces, create a Python program in **streamlit_app.py**, and then run it. If there are any errors, identify them and how to fix them, until there are no errors.
 
 - If it runs successfully (no errors), run this command below at Terminal. Copy and paste it, then press Enter. Wait a few minutes until the process finished, then a message will appear at the bottom right of the screen [run in Browser] --> select the button and it will go to the browser we are aiming for.
 
