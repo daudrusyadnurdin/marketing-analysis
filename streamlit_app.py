@@ -539,6 +539,23 @@ st.markdown("""
 
 st.markdown("---")
 
+st.markdown("""
+#### General Conclusions
+- A churn rate of 26.5% (assuming a year) is quite high for a telco business in the US. 
+  According to several sources, the normal annual churn rate ranges from 15-25% (source: CustomerGauge), with an average of 22%. 
+  Therefore, this company's churn rate is considered high.
+- Financially, it results in a loss of revenue of approximately 17.8% in the future, potentially losing nearly one-fifth of revenue 
+  if churn is not addressed. 
+  Furthermore, if a customer acquisition program is implemented and the costs are high, 
+  this will make it difficult for the company to maintain financial stability (revenue).
+- Mitigation opportunities include focusing on customer retention programs, which require strategies such as 
+  loyalty programs, upselling, proactive support, and service improvements to be prioritized.
+- In short, this telco company is currently facing quite high churn and the potential for significant revenue losses. 
+  Customer retention must be a primary focus to maintain revenue stability
+"""
+)
+st.markdown("---")
+
 #-----------------------------------------------------------------------------------------------------------------
 # --- Display sample of raw data
 #-----------------------------------------------------------------------------------------------------------------
