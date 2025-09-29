@@ -288,9 +288,9 @@ with col2:
 #-------------------------
 # set new columms
 #-------------------------
-col1, col2 = st.columns(2)
+col3, col4 = st.columns(2)
 
-with col1:
+with col3:
     #-------------------
     #TOP 10 - TOTAL CURN
     #-------------------
@@ -329,7 +329,7 @@ with col1:
 
     st.pyplot(fig)
 
-with col2:
+with col4:
     #-------------------
     #TOP 10 - % CURN
     #-------------------
@@ -340,7 +340,7 @@ with col2:
     # Hitung dulu total customer untuk di-merged dengan top-10 churn, yang sudah dihitung sebelumnya
     # informasi ini hanya pelengkap saja.
     df_barh2 = (df.groupby("City")['CustomerID'].count().reset_index()
-                .sort_values(by='CustomerID', ascending=False).head(10)
+                .sort_values(by='CustomerID', ascending=False) #.head(10) BUG!!
                 .sort_values(by='CustomerID')
                 )
     # Join/merge berdasarkan kolom City
