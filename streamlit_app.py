@@ -1,6 +1,6 @@
-#-----------------------------------------------------------------------------------------------------
-# Call library, esp. streamlit
-#-----------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------
+# Call library, esp. streamlit, pandas, numpy, etc
+#-----------------------------------------------------------------------------------------------------------------
 import streamlit as st
 import pandas as pd
 import numpy as np #number
@@ -10,15 +10,12 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import plotly.graph_objects as go
 
-# import requests
-# from io import StringIO
-
 import warnings
 warnings.filterwarnings('ignore')
 
-#-----------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------
 # --- Page configuration
-#-----------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------
 st.set_page_config(
    page_title="Telco Customer Churn Analysis", # @browser
    page_icon="📊",
@@ -26,9 +23,9 @@ st.set_page_config(
    initial_sidebar_state="expanded"
 )
 
-#-----------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------
 # Retrieve the data: Telco_customer_churn.csv @github
-#-----------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------
 @st.cache_data # to enhance performance
 def load_data():
     url = "https://raw.githubusercontent.com/daudrusyadnurdin/marketing-analysis/master/Telco_customer_churn.csv"
@@ -39,9 +36,9 @@ df = load_data()
 # Special case: handling data type conversion
 df['Total Charges'] = pd.to_numeric(df['Total Charges'], errors='coerce')
 
-#-----------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------
 # App banner and title & description
-#-----------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------
 
 # Gambar header dari GitHub (RAW URL)
 header_image_url = "https://raw.githubusercontent.com/daudrusyadnurdin/marketing-analysis/master/telco-business.jpg"
@@ -55,9 +52,9 @@ st.markdown("""
             The following is a simulation of a churn analysis for a telecommunications company in California, USA.
 """)
 
-#-----------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------
 # Filtering parameter
-#-----------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------
 # Sidebar filters
 st.sidebar.header("Filtering parameters")
 
@@ -92,9 +89,9 @@ rg_monthly_charges = st.sidebar.slider(
     value=(min_monchrg, max_monchrg)
 )
 
-#-----------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------
 # Select the data based on filtering parameters
-#-----------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------
 df_selected = df.copy()
 
 # Apply multiselect filters only if a selection has been made for that filter
@@ -123,9 +120,9 @@ if df_selected.empty:
    st.warning("No data available for the selected filters. Please adjust your selection.")
    st.stop() # Halts the app execution
 
-#-----------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------
 # Dashboard & reporting
-#-----------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------
 #-------------------------------------
 # KPI
 #-------------------------------------
@@ -171,7 +168,7 @@ df_cr = (
 # --- Buat daftar warna dinamis ---
 n = len(df_cr)
 # default semua lightgrey
-colors = ["lightgrey"] * n
+colors = ['#E2E2E2'] * n
 # ganti 3 terakhir (nilai tertinggi) jadi lightsalmon, salmon, tomato
 top_colors = ["tomato", "salmon", "lightsalmon"]
 for i, c in enumerate(top_colors, start=1):
@@ -198,7 +195,12 @@ plt.tight_layout()
 # --- Tampilkan di Streamlit ---
 st.pyplot(fig)
 
+st.markdown("---")
 
+#-------------------------
+# set columns
+#-------------------------
+col_custom = 'black'
 col1, col2 = st.columns(2)
 
 with col1:
@@ -208,15 +210,17 @@ with col1:
     st.subheader("💰 Top 10 most productive cities...")
 
     # --- Data (contoh sesuai kode Anda) ---
-    df_chrg_chrn10 = df_selected.groupby('City')[['Total Charges', 'Churn Value']].sum().reset_index().sort_values(by='Total Charges', ascending=False).head(10).reset_index(drop=True)
+    df_chrg_chrn10 = (df_selected.groupby('City')[['Total Charges', 'Churn Value']].sum().reset_index()
+                      .sort_values(by='Total Charges', ascending=False).head(10).reset_index(drop=True)
+                    )
     df_barh = df_chrg_chrn10.sort_values(by='Total Charges')
 
     # --- Figure & Axis ---
     fig, ax = plt.subplots(figsize=(10, 6)) 
 
     # --- Plot Horizontal Bar ---
-    colors = ['lightgrey'] * len(df_barh)
-    # colors[-3:] = ['lightgreen', 'limegreen', 'green']
+    colors = ['#E2E2E2'] * len(df_barh)
+    # colors[-3:] = ['lightgreen', 'limegreen', 'green'] --> original ver @ assignment day 13
     colors[-3:] = ['#deebf7', '#6baed6', '#08519c']
     ax.barh(
         df_barh['City'],
@@ -227,8 +231,8 @@ with col1:
     ax.tick_params(axis='y', labelsize=15)   # nama kota pada sumbu Y
 
     # --- Judul & Label ---
-    ax.set_ylabel("City", fontsize=16, color='red')
-    ax.set_xlabel("Total Charges (x1000)", fontsize=16, color='red')
+    ax.set_ylabel("City", fontsize=16, color=col_custom)
+    ax.set_xlabel("Total Charges (x1000)", fontsize=16, color=col_custom)
 
     # --- Grid & Style ---
     ax.grid(axis='x', ls='--', color='lavender')
@@ -251,10 +255,13 @@ with col2:
 
     fig, ax = plt.subplots(figsize=(10, 6)) 
 
-    df_barh = df_selected.groupby("City")['CustomerID'].count().reset_index().sort_values(by='CustomerID', ascending=False).head(10).sort_values(by='CustomerID')
+    df_barh = (df_selected.groupby("City")['CustomerID'].count().reset_index()
+               .sort_values(by='CustomerID', ascending=False).head(10)
+               .sort_values(by='CustomerID')
+                )
+    colors = ['#E2E2E2'] * len(df_barh)
 
-    colors = ['lightgrey'] * len(df_barh)
-    # colors[-3:] = ['lightgreen', 'limegreen', 'green']
+    # colors[-3:] = ['lightgreen', 'limegreen', 'green'] --> original version @Assignment Day 13
     colors[-3:] = ['#deebf7', '#6baed6', '#08519c']
     ax.barh(  df_barh['City'],
                 df_barh['CustomerID'],
@@ -263,8 +270,8 @@ with col2:
     ax.tick_params(axis='x', labelsize=15)   # angka pada sumbu X
     ax.tick_params(axis='y', labelsize=15)   # nama kota pada sumbu Y
 
-    ax.set_ylabel("City", fontsize=16, color='red')
-    ax.set_xlabel("Total Customer", fontsize=16, color='red')
+    ax.set_ylabel("City", fontsize=16, color=col_custom)
+    ax.set_xlabel("Total Customer", fontsize=16, color=col_custom)
 
     ax.grid(axis='x', ls='--', color='lavender')
 
@@ -278,8 +285,9 @@ with col2:
 
     st.pyplot(fig)
 
-
-
+#-------------------------
+# set new columms
+#-------------------------
 col1, col2 = st.columns(2)
 
 with col1:
@@ -289,10 +297,15 @@ with col1:
     st.subheader("💔 Top 10 most churn cities...")
 
     fig, ax = plt.subplots(figsize=(10, 6)) 
-    df_barh = df_selected.groupby("City")['Churn Value'].sum().reset_index().sort_values(by='Churn Value', ascending=False).head(10).sort_values(by='Churn Value')
-    
+    df_barh = (df_selected
+                .groupby("City")['Churn Value'].sum()
+                .reset_index()
+                .sort_values(by='Churn Value', ascending=False)
+                .head(10)
+                .sort_values(by='Churn Value')
+                )
     n = len(df_barh)
-    colors = ["lightgrey"] * n
+    colors = ['#E2E2E2'] * n
     colors[-3:] = ["lightsalmon", "salmon", "tomato"]
     ax.barh(  df_barh['City'],
               df_barh['Churn Value'],
@@ -301,8 +314,8 @@ with col1:
     ax.tick_params(axis='x', labelsize=15)   # angka pada sumbu X
     ax.tick_params(axis='y', labelsize=15)   # nama kota pada sumbu Y
 
-    ax.set_ylabel("City", fontsize=16, color='red')
-    ax.set_xlabel("Total Churn", fontsize=16, color='red')
+    ax.set_ylabel("City", fontsize=16, color=col_custom)
+    ax.set_xlabel("Total Churn", fontsize=16, color=col_custom)
 
     ax.grid(axis='x', ls='--', color='lavender')
 
@@ -318,16 +331,18 @@ with col1:
 
 with col2:
     #-------------------
-    #TOP 10 - TOTAL CURN
+    #TOP 10 - % CURN
     #-------------------
     st.subheader("")
 
     fig, ax = plt.subplots(figsize=(10, 6)) 
-    # df_barh = df_selected.groupby("City")['Churn Value'].sum().reset_index().sort_values(by='Churn Value', ascending=False).head(10).sort_values(by='Churn Value')
     
-    # Hitung dulu total customer untuk di-merged dengan top-10 churn
-    df_barh2 = df.groupby("City")['CustomerID'].count().reset_index().sort_values(by='CustomerID', ascending=False).head(10).sort_values(by='CustomerID')
-
+    # Hitung dulu total customer untuk di-merged dengan top-10 churn, yang sudah dihitung sebelumnya
+    # informasi ini hanya pelengkap saja.
+    df_barh2 = (df.groupby("City")['CustomerID'].count().reset_index()
+                .sort_values(by='CustomerID', ascending=False).head(10)
+                .sort_values(by='CustomerID')
+                )
     # Join/merge berdasarkan kolom City
     # df_barh sudah dihitung sebelumnya, karena grafik ini kelanjutan dari grafik sebelumnya
     df_merge = pd.merge(
@@ -345,7 +360,7 @@ with col2:
     df_merge = df_merge.sort_values(by='Churn %', ascending=True)
 
     n = len(df_merge)
-    colors = ["lightgrey"] * n
+    colors = ['#E2E2E2'] * n
     colors[-3:] = ["lightsalmon", "salmon", "tomato"]
     ax.barh(  df_merge['City'],
             #   df_sorted['Churn Value']/df_merge['CustomerID']*100,
@@ -358,8 +373,8 @@ with col2:
     ax.tick_params(axis='x', labelsize=15)   # angka pada sumbu X
     ax.tick_params(axis='y', labelsize=15)   # nama kota pada sumbu Y
 
-    ax.set_ylabel("City", fontsize=16, color='red')
-    ax.set_xlabel("%age Churn", fontsize=16, color='red')
+    ax.set_ylabel("City", fontsize=16, color=col_custom)
+    ax.set_xlabel("%age Churn", fontsize=16, color=col_custom)
 
     ax.grid(axis='x', ls='--', color='lavender')
 
@@ -370,11 +385,15 @@ with col2:
 
     st.pyplot(fig)
 
-#-----------------------------------------------------------------------------------------------------
+st.markdown("---")
+
+#-----------------------------------------------------------------------------------------------------------------
 # CLTV vs Churn analysis
-#-----------------------------------------------------------------------------------------------------
-st.subheader("📊 Will CLTV customers Churn?")
-st.markdown("Analyzing customer lifetime value relationship with churn behavior")
+#-----------------------------------------------------------------------------------------------------------------
+st.subheader("📊 Will our high level CLTV customers churn?")
+st.markdown("""
+    Analyzing customer lifetime value relationship with churn behavior.
+""")
 
 # Create CLTV segments
 q1 = df_selected['CLTV'].quantile(0.33)
@@ -448,6 +467,7 @@ with col2:
                     color='CLTV Segment',
                     color_discrete_sequence=colors
                 )
+    
     fig2.update_traces(textposition='inside', textinfo='percent+label')
     st.plotly_chart(fig2, use_container_width=True)
 
@@ -474,7 +494,6 @@ with col3:
 
 with col4:
     # Monthly Charges vs Tenure
-
     fig4 = go.Figure()
     fig4.add_trace(go.Bar(
                         name='Avg Monthly Charges',
@@ -495,7 +514,7 @@ with col4:
                         textposition='top center',
                         yaxis='y2'
                     ))
-    
+   
     fig4.update_layout(
                         title='<b>Monthly Charges & Tenure by Segment</b>',
                         xaxis_title="CLTV Segment",
@@ -509,25 +528,36 @@ with col4:
                     )
     st.plotly_chart(fig4, use_container_width=True)
 
+# Defisi CLTV segmen
+st.markdown("**CLTV segmen Definition:** ")
+st.markdown("""
+            - CLTV ≥ 5000        : 'Platinum'
+            - 2500 ≤ CLTV < 5000 : 'Gold' 
+            - 1000 ≤ CLTV < 2500 : 'Silver'
+            - CLTV < 1000        : 'Bronze' 
+            """)
 
+st.markdown("---")
 
-#-----------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------
 # --- Display sample of raw data
-#-----------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------
 with st.expander("View Sample of Raw Data"):
    st.dataframe(df)
    st.markdown(f"**Data Dimensions:** {df.shape[0]} rows, {df.shape[1]} columns")
 
 
-#-----------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------
 # Some additional information of this work
-#-----------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------
 st.markdown("---")
 st.write("Data Source: [Telco Customer Churn Dataset](https://github.com/daudrusyadnurdin/marketing-analysis)")
 st.write("") 
-st.write("This assignment was created with reference to the previous assignment, namely: " \
-         "**Day 13 - Fundamentals of Data Visualization**, with several modifications adapted to the environment in Streamlit. "\
-         "Based on the dataset's structure, no date information was found. This data represents a snapshot of customer status (churn/non-churn) at a telco company in California, USA."
-         )
+st.write("""
+        This assignment was created with reference to the previous assignment, namely:
+        **Day 13 - Fundamentals of Data Visualization**, with several modifications adapted to the environment in Streamlit.
+        Based on the dataset's structure, no date information was found. 
+        This data represents a snapshot of customer status (churn/non-churn) at a telco company in California, USA.
+         """)
 
-#---The End-------------------------------------------------------------------------------------------
+#---The End-------------------------------------------------------------------------------------------------------
