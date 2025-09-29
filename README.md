@@ -14,8 +14,8 @@ forums](https://discuss.streamlit.io).<br><br>
 
   **$ streamlit run streamlit_app.py --server.enableCORS false --server.enableXsrfProtection false**
 
-- Before deploying your job, it's a good idea to give it a meaningful name in streamlit.io. For example, in this task, I named it **telco-customer-churn-analysis-2025.streamlit.app**. **streamlit.app** is the default streamlit name.
+- Before deploying your job, it's a good idea to give it a meaningful name in **streamlit.io**. For example, in this task, I named it **telco-customer-churn-analysis-2025.streamlit.app**. **streamlit.app** is the default streamlit name.
 
 - To deploy streamlit's work, create a **runtime.txt** in the root of the github repository and fill it with **python-3.11** or another stable version.
 
-- Don't forget to include all the libraries imported in the Python program that we created in the **requirements.txt file**.
+- Don't forget to include all the libraries imported in the Python program that we created in the **requirements.txt** file.
