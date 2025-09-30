@@ -232,7 +232,7 @@ with col1:
 
     # --- Judul & Label ---
     ax.set_ylabel("City", fontsize=16, color=col_custom)
-    ax.set_xlabel("Total Charges (x1000)", fontsize=16, color=col_custom)
+    ax.set_xlabel("Total Charges (x1000 US$)", fontsize=16, color=col_custom)
 
     # --- Grid & Style ---
     ax.grid(axis='x', ls='--', color='lavender')
@@ -240,7 +240,7 @@ with col1:
     ax.spines['right'].set_visible(False)
 
     # --- Annotasi Bar ---
-    ax.bar_label(ax.containers[0], fmt='%.0f', padding=3, fontsize=15)
+    ax.bar_label(ax.containers[0], fmt='%.2f', padding=3, fontsize=15)
 
     plt.tight_layout()
 
