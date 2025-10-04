@@ -559,7 +559,7 @@ st.markdown("---")
 #-----------------------------------------------------------------------------------------------------------------
 # --- Display of raw data
 #-----------------------------------------------------------------------------------------------------------------
-with st.expander("View Sample of Raw Data"):
+with st.expander("View of Raw Data"):
    st.dataframe(df)
    st.markdown(f"**Data Dimensions:** {df.shape[0]} rows, {df.shape[1]} columns")
 
